@@ -86,7 +86,7 @@ fi
 # ---- 7. Reduce CPU Throttling ----
 echo "[claude-mobile] Optimizing CPU performance..."
 if [ -w /sys/devices/system/cpu ]; then
-  for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null; do
+  for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
     echo "performance" > "$cpu" 2>/dev/null || true
   done
 fi

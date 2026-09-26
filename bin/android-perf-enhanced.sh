@@ -82,7 +82,7 @@ fi
 echo "[android-perf] Configuring trackpad for mobile touch..."
 if command -v xinput >/dev/null 2>&1; then
   # Find and configure trackpad devices
-  for device in $(xinput list --id-only); do
+  for device in $(xinput list --id-only 2>/dev/null || true); do
     name=$(xinput list-props "$device" 2>/dev/null | head -1 || true)
     # Disable acceleration for more predictable touch response
     xinput set-prop "$device" "Accel Speed" 0 2>/dev/null || true
