@@ -2,99 +2,85 @@
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please email security@example.com instead of using the issue tracker.
+If you discover a security vulnerability, please email security@example.com.
 
-## Security Recommendations
+## For Local Testing
 
-### For Local Testing
+✅ Self-signed HTTPS is acceptable  
+✅ Bind to localhost only  
+✅ Use a strong password  
+✅ Keep behind firewall  
 
-1. Self-signed HTTPS certificate is acceptable
-2. Bind to localhost only
-3. Use a strong password for WEBTOP_PASSWORD
-4. Keep the container behind a firewall
+## For Production Deployment
 
-### For Production Deployment
+⚠️ **DO NOT expose port 3001 directly to the internet**
 
-1. **Use a reverse proxy** with valid TLS certificate (nginx, Caddy, HAProxy)
-2. **Enable authentication** before allowing access
-3. **Use a VPN or SSH tunnel** for remote access
-4. **Set resource limits** in docker-compose.yml
-5. **Keep images updated** for security patches
-6. **Monitor logs** for suspicious activity
-7. **Use strong passwords** (minimum 16 characters)
-8. **Restrict network access** with firewall rules
-9. **Consider rate limiting** for login attempts
-10. **Regular backups** of user data in ./config/
+1. Use a reverse proxy (nginx, Caddy) with valid TLS
+2. Require authentication
+3. Use VPN or SSH tunnel for remote access
+4. Keep images updated
+5. Monitor access logs
+6. Use strong passwords (16+ characters)
+7. Set resource limits
+8. Regular backups of ./config/
 
-## What's Disabled for Security
-
-These features are disabled by default to reduce attack surface:
+## Disabled by Default (For Security)
 
 - File transfers (use clipboard instead)
 - Session sharing
 - Binary clipboard
-- Audio/microphone access
+- Audio/microphone
 - GamePad support
 
 ## Best Practices
 
-### Network
-
-```bash
-# Do NOT expose 3001 directly:
-# docker compose up  # Wrong!
-
-# Use reverse proxy instead:
-WEBTOP_HTTPS_BIND=127.0.0.1  # Only localhost
-```
-
 ### Passwords
 
 ```bash
-# Use a long, random password
+# Generate secure password
 WEBTOP_PASSWORD=$(openssl rand -base64 32)
-echo "WEBTOP_PASSWORD=$WEBTOP_PASSWORD" >> .env
+echo $WEBTOP_PASSWORD
 ```
 
-### Container Security
+### Network
+
+```bash
+# Only expose locally
+WEBTOP_HTTPS_BIND=127.0.0.1
+
+# Use reverse proxy with TLS for remote access
+```
+
+### Docker Security
 
 ```yaml
-# docker-compose.yml example
+# In docker-compose.yml
 services:
   desktop:
-    # ... existing config ...
     cap_drop:
       - ALL
     cap_add:
       - NET_BIND_SERVICE
-    read_only: false  # Needs write access for config
 ```
 
-## Compliance
+## Keep Updated
 
-- No data is sent to external services by default
-- All communication is local to the container
-- User data stored in ./config/ directory only
-- No telemetry or analytics
-
-## Supported Versions
-
-Security updates are provided for:
-
-- Latest major version
-- Previous major version
-
-## Dependency Security
-
-Base image: `lscr.io/linuxserver/webtop:ubuntu-xfce`
-
-Check for updates:
 ```bash
+# Check for base image updates
 docker pull lscr.io/linuxserver/webtop:ubuntu-xfce
-```
 
-Rebuild if updates available:
-```bash
+# Rebuild if new version available
 docker compose build --no-cache
 docker compose up -d
 ```
+
+## No Telemetry
+
+- No data sent externally
+- All communication local
+- User data in ./config/ only
+- No analytics
+
+---
+
+**Keep your Claude Desktop remote setup secure!**

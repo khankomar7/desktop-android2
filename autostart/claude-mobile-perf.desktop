@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Desktop Mobile Optimization
+Comment=Optimize Claude Desktop for fast mobile streaming and responsive UI
+Exec=/usr/local/bin/claude-mobile-perf.sh
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

@@ -5,28 +5,33 @@ services:
       args:
         TARGETARCH: amd64
     platform: linux/amd64
-    container_name: claude-remote-desktop
+    container_name: claude-mobile-desktop
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-Asia/Tehran}
-      CUSTOM_USER: ${WEBTOP_USER:?Set WEBTOP_USER in .env or your environment}
-      PASSWORD: ${WEBTOP_PASSWORD:?Set WEBTOP_PASSWORD in .env or your environment}
+      CUSTOM_USER: ${WEBTOP_USER:?Set WEBTOP_USER in .env or environment}
+      PASSWORD: ${WEBTOP_PASSWORD:?Set WEBTOP_PASSWORD in .env or environment}
 
-      # Android-first performance profile
-      MAX_RES: ${MAX_RES:-1280x720}
-      SELKIES_ENCODER: ${SELKIES_ENCODER:-x264enc-striped}
-      SELKIES_FRAMERATE: ${SELKIES_FRAMERATE:-24}
-      SELKIES_H264_CRF: ${SELKIES_H264_CRF:-30}
+      # ============================================================================
+      # Claude Desktop Mobile Optimization Profile
+      # Tuned specifically for fast Claude Desktop responsiveness on Android
+      # ============================================================================
 
-      # Responsive mobile behavior
+      # Stream quality: Optimized for Claude's UI responsiveness
+      MAX_RES: ${MAX_RES:-1280x720}              # 720p: fast, readable for code
+      SELKIES_ENCODER: ${SELKIES_ENCODER:-x264enc-striped}      # Lowest latency
+      SELKIES_FRAMERATE: ${SELKIES_FRAMERATE:-24}               # Smooth but responsive
+      SELKIES_H264_CRF: ${SELKIES_H264_CRF:-30}   # Fast encoding, acceptable quality
+
+      # Input responsiveness for Claude interaction
       SELKIES_USE_BROWSER_CURSORS: ${SELKIES_USE_BROWSER_CURSORS:-true|locked}
       SELKIES_USE_CSS_SCALING: ${SELKIES_USE_CSS_SCALING:-true|locked}
       SELKIES_USE_PAINT_OVER_QUALITY: ${SELKIES_USE_PAINT_OVER_QUALITY:-true|locked}
       SELKIES_FORCE_ALIGNED_RESOLUTION: ${SELKIES_FORCE_ALIGNED_RESOLUTION:-true|locked}
       SELKIES_SCALING_DPI: ${SELKIES_SCALING_DPI:-96|locked}
 
-      # Disable resource-heavy extras
+      # Disable resource-heavy features that interfere with Claude Desktop
       SELKIES_AUDIO_ENABLED: ${SELKIES_AUDIO_ENABLED:-false|locked}
       SELKIES_MICROPHONE_ENABLED: ${SELKIES_MICROPHONE_ENABLED:-false|locked}
       SELKIES_GAMEPAD_ENABLED: ${SELKIES_GAMEPAD_ENABLED:-false|locked}
@@ -36,7 +41,7 @@ services:
       SELKIES_ENABLE_SHARING: ${SELKIES_ENABLE_SHARING:-false|locked}
       SELKIES_SECOND_SCREEN: ${SELKIES_SECOND_SCREEN:-false|locked}
 
-      # Keep mobile UI minimal
+      # Keep UI minimal for mobile screens - focus on Claude Desktop
       SELKIES_UI_SHOW_CORE_BUTTONS: ${SELKIES_UI_SHOW_CORE_BUTTONS:-false|locked}
       SELKIES_UI_SIDEBAR_SHOW_AUDIO_SETTINGS: ${SELKIES_UI_SIDEBAR_SHOW_AUDIO_SETTINGS:-false|locked}
       SELKIES_UI_SIDEBAR_SHOW_FILES: ${SELKIES_UI_SIDEBAR_SHOW_FILES:-false|locked}
@@ -51,11 +56,16 @@ services:
       SELKIES_UI_SIDEBAR_SHOW_FULLSCREEN: ${SELKIES_UI_SIDEBAR_SHOW_FULLSCREEN:-true}
       SELKIES_UI_SIDEBAR_SHOW_KEYBOARD_BUTTON: ${SELKIES_UI_SIDEBAR_SHOW_KEYBOARD_BUTTON:-true}
 
+      # Claude Desktop specific environment
+      GTK_FONT_NAME: ${GTK_FONT_NAME:-"Sans 9"}
+      QT_QPA_PLATFORMTHEME: ${QT_QPA_PLATFORMTHEME:-gtk2}
+
     ports:
       - "${WEBTOP_HTTPS_BIND:-0.0.0.0}:3001:3001"
 
     volumes:
       - ./config:/config
+      - ./claude-config:/home/abc/.config/claude-desktop
 
     restart: unless-stopped
     shm_size: "2gb"
