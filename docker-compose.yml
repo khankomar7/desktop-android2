@@ -1,0 +1,74 @@
+services:
+  desktop:
+    build:
+      context: .
+      args:
+        TARGETARCH: amd64
+    platform: linux/amd64
+    container_name: claude-remote-desktop
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Tehran}
+      CUSTOM_USER: ${WEBTOP_USER:?Set WEBTOP_USER in .env or your environment}
+      PASSWORD: ${WEBTOP_PASSWORD:?Set WEBTOP_PASSWORD in .env or your environment}
+
+      # Android-first performance profile
+      MAX_RES: ${MAX_RES:-1280x720}
+      SELKIES_ENCODER: ${SELKIES_ENCODER:-x264enc-striped}
+      SELKIES_FRAMERATE: ${SELKIES_FRAMERATE:-24}
+      SELKIES_H264_CRF: ${SELKIES_H264_CRF:-30}
+
+      # Responsive mobile behavior
+      SELKIES_USE_BROWSER_CURSORS: ${SELKIES_USE_BROWSER_CURSORS:-true|locked}
+      SELKIES_USE_CSS_SCALING: ${SELKIES_USE_CSS_SCALING:-true|locked}
+      SELKIES_USE_PAINT_OVER_QUALITY: ${SELKIES_USE_PAINT_OVER_QUALITY:-true|locked}
+      SELKIES_FORCE_ALIGNED_RESOLUTION: ${SELKIES_FORCE_ALIGNED_RESOLUTION:-true|locked}
+      SELKIES_SCALING_DPI: ${SELKIES_SCALING_DPI:-96|locked}
+
+      # Disable resource-heavy extras
+      SELKIES_AUDIO_ENABLED: ${SELKIES_AUDIO_ENABLED:-false|locked}
+      SELKIES_MICROPHONE_ENABLED: ${SELKIES_MICROPHONE_ENABLED:-false|locked}
+      SELKIES_GAMEPAD_ENABLED: ${SELKIES_GAMEPAD_ENABLED:-false|locked}
+      SELKIES_ENABLE_BINARY_CLIPBOARD: ${SELKIES_ENABLE_BINARY_CLIPBOARD:-false|locked}
+      SELKIES_CLIPBOARD_ENABLED: ${SELKIES_CLIPBOARD_ENABLED:-true}
+      SELKIES_FILE_TRANSFERS: ${SELKIES_FILE_TRANSFERS:-none|locked}
+      SELKIES_ENABLE_SHARING: ${SELKIES_ENABLE_SHARING:-false|locked}
+      SELKIES_SECOND_SCREEN: ${SELKIES_SECOND_SCREEN:-false|locked}
+
+      # Keep mobile UI minimal
+      SELKIES_UI_SHOW_CORE_BUTTONS: ${SELKIES_UI_SHOW_CORE_BUTTONS:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_AUDIO_SETTINGS: ${SELKIES_UI_SIDEBAR_SHOW_AUDIO_SETTINGS:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_FILES: ${SELKIES_UI_SIDEBAR_SHOW_FILES:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_SHARING: ${SELKIES_UI_SIDEBAR_SHOW_SHARING:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_GAMEPADS: ${SELKIES_UI_SIDEBAR_SHOW_GAMEPADS:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_STATS: ${SELKIES_UI_SIDEBAR_SHOW_STATS:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_GAMING_MODE: ${SELKIES_UI_SIDEBAR_SHOW_GAMING_MODE:-false|locked}
+      SELKIES_UI_SIDEBAR_SHOW_SCREEN_SETTINGS: ${SELKIES_UI_SIDEBAR_SHOW_SCREEN_SETTINGS:-true}
+      SELKIES_UI_SIDEBAR_SHOW_VIDEO_SETTINGS: ${SELKIES_UI_SIDEBAR_SHOW_VIDEO_SETTINGS:-true}
+      SELKIES_UI_SIDEBAR_SHOW_CLIPBOARD: ${SELKIES_UI_SIDEBAR_SHOW_CLIPBOARD:-true}
+      SELKIES_UI_SIDEBAR_SHOW_TRACKPAD: ${SELKIES_UI_SIDEBAR_SHOW_TRACKPAD:-true}
+      SELKIES_UI_SIDEBAR_SHOW_FULLSCREEN: ${SELKIES_UI_SIDEBAR_SHOW_FULLSCREEN:-true}
+      SELKIES_UI_SIDEBAR_SHOW_KEYBOARD_BUTTON: ${SELKIES_UI_SIDEBAR_SHOW_KEYBOARD_BUTTON:-true}
+
+    ports:
+      - "${WEBTOP_HTTPS_BIND:-0.0.0.0}:3001:3001"
+
+    volumes:
+      - ./config:/config
+
+    restart: unless-stopped
+    shm_size: "2gb"
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -kfsS https://localhost:3001/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-4}"
+          memory: ${MEMORY_LIMIT:-4G}

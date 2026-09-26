@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.env.*
+config/
+README.md
+LICENSE
+SECURITY.md
+bin/
+autostart/
+.idea/
+.vscode/
